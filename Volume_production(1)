@@ -1,0 +1,65 @@
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+
+namespace Leran
+{
+    class Volume_production_1_
+    {
+        /// <summary>
+        /// 下面我们使用最简单的Insert语句来插入100万条数据
+        /// </summary>
+        public  void simple_Method()
+        { 
+               Stopwatch sw = new Stopwatch();
+            string connstring = @"server=SUNNY\SQLEXPRESS; database=TestDB;UID=sa;PWD=123456";
+            SqlConnection sqlConn = new SqlConnection(connstring);
+
+            SqlCommand sqlComm = new SqlCommand();
+            sqlComm.CommandText = string.Format("insert into tb_picture(Name,PIC,C_TIME)values(@p0,@p1,@p2)");//参数化SQL  
+            sqlComm.Parameters.Add("@p0", SqlDbType.VarChar);
+            sqlComm.Parameters.Add("@p1", SqlDbType.NVarChar);
+            sqlComm.Parameters.Add("@p2", SqlDbType.NVarChar);
+            sqlComm.CommandType = CommandType.Text;
+            sqlComm.Connection = sqlConn;
+            sqlConn.Open();
+            try
+            {
+                //循环插入100万条数据，每次插入10万条，分10次插入。  
+                for (int multiply = 0; multiply < 10; multiply++)
+                {
+                    for (int count = multiply * 100000; count < (multiply + 1) * 100000; count++)
+                    {
+
+                        sqlComm.Parameters["@p0"].Value = count;
+                        sqlComm.Parameters["@p1"].Value = string.Format("PIC-{0}", count * multiply);
+                        sqlComm.Parameters["@p2"].Value = string.Format("C_TIME-{0}", count * multiply);
+                        sw.Start();
+                        sqlComm.ExecuteNonQuery();
+                        sw.Stop();
+                    }
+                    //每插入10万条数据后，显示此次插入所用时间  
+                    Console.WriteLine(string.Format("Elapsed Time is {0} Milliseconds", sw.ElapsedMilliseconds));
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+
+            Console.ReadLine();
+        }
+    }
+}
