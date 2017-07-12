@@ -32,7 +32,7 @@ namespace Leran
             sqlConn.Open();
             try
             {
-                //循环插入100万条数据，每次插入10万条，分10次插入。  
+                //循环插入100万条数据，每次插入10万条，分10次插入/////。  
                 for (int multiply = 0; multiply < 10; multiply++)
                 {
                     for (int count = multiply * 100000; count < (multiply + 1) * 100000; count++)
